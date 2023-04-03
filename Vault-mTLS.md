@@ -1,9 +1,7 @@
 # vault-mTLS
 
-
-vault를 활용한 mTLS 사용 가이드
+vault pki를 활용한 mTLS 사용 가이드
 (Dev 환경을 기준으로 구축)
-
 
 
 ## 1. vault 실행
@@ -11,18 +9,15 @@ vault를 활용한 mTLS 사용 가이드
 
 ### 1-1. dev 서버로 실행
 
-
 ```
 vault server -dev
 ```
-
 
 
 ## 2. vault 사용 환경 구축
 
 
 ### 2-1. vault 주소 지정
-
 
 ```
 export vault_ADDR=http://127.0.0.1:8200
@@ -31,24 +26,21 @@ export vault_ADDR=http://127.0.0.1:8200
 
 ### 2-2. Root Ten으로 로그인 하기
 
-
 ```
 vault login
-&nbsp;
+
 Token (will be hidden): [Root_Token]
 ```
 또는
 ```
-export vault_TOKEN=[Root_Token]
+export VAULT_TOKEN=[Root_Token]
 ```
 
 
-
-## 3. pki를 활용하여 인증서 생성
+## 3. pki를 활용하여 'service-a', 'service-b' 인증서 생성
 
 
 ### 3-1. pki 활성화
-
 
 ```
 vault secrets enable pki
@@ -57,7 +49,6 @@ vault secrets enable pki
 
 ### 3-2. default MAX_TTL 변경
 
-
 ```
 vault secrets tune -max-lease-ttl=876006h pki
 ```
@@ -65,7 +56,6 @@ vault secrets tune -max-lease-ttl=876006h pki
 
 
 ### 3-3. Root CA 생성
-
 
 ```
 vault write pki/root/generate/internal \
@@ -91,15 +81,8 @@ vault write pki/root/generate/internal \
 - common_name : 인증서가 발급되는 도메인 이름
 - ttl : 발급되는 인증서의 유효기간
 
-
-위 명령어를 입력할 경우 아래와 같은 output이 나옴
-```
-This mount hasn't configured any authority information access (AIA)
-fields; this may make it harder for systems to find missing certificates
-in the chain or to validate revocation status of certificates. Consider
-updating /config/urls or the newly generated issuer with this information.
-```
-이는 AIA(Authority Information Access) 필드가 제대로 설정되지 않아 인증서 체인을 검증하는데 어려움을 겪을 수 있다는 것을 의미하는데 `pki/config/urls` Endpoint를 설정하면 해결됨
+'certificate'와 'issuing_ca' 2개가 발급되는데 이 예제에서는 Intermediate CA를 따로 지정하지 않아 2개의 값이 같음
+둘중 아무거나 복사하여 'ca.crt'로 저장
 
 
 ### 3-4. CRL(Certificate Revocation List)의 Endpoint 작성
@@ -121,16 +104,63 @@ vault write pki/config/urls \
 ```
 vault write pki/roles/example-dot-com \
     allowed_domains=example.com \
-    allow_subdomains=true \
-    max_ttl=87600h
+    allow_subdomains=true
 ```
 - allowed_domains : 인증서를 발급받을 수 있는 도메인 지정
 - allow_subdomains : 지정된 도메인의 하위 도메인에서도 인증서 발급을 가능하게 할 것인가에 대한 설정
 미리 Role을 구성해 놓고 나중에 지정한 Role을 따르는 인증서를 발급
 
 
-### 3-6. 발급
+### 3-6. 'service-a' 인증서 발급
 ```
 vault write pki/issue/example-dot-com \
     common_name=service-a.example.com
 ```
+- common_name : 인증서의 주체를 지정
+
+'ca_chain', 'certificate', 'issuing_ca', 'private_key' 4개가 발급됨
+- ca_chain : Root CA를 포함한 인증서 체인
+- certificate : 인증서의 공개키와 서버의 정보
+- issuing_ca : 인증서를 발급한 Intermediate CA의 인증서 (이 예제의 경우 Intermediate CA를 따로 지정하지 않아 Root CA와 값이 같음)
+- private_key : 인증서의 개인키 정보
+
+'certificate'를 'service-a.crt'파일로 저장하고 private_key를 'service-a.key'파일로 저장
+
+
+### 3-7. 'service-b' 인증서 발급
+```
+vault write pki/issue/example-dot-com \
+    common_name=service-b.example.com
+```
+
+'certificate'를 'service-b.crt'파일로 저장하고 private_key를 'service-b.key'파일로 저장
+
+
+## 4. mTLS 테스트
+
+
+### 4-1. 사전 준비 사항
+
+python 버전 확인
+```
+python3 --version
+Python 3.8.10
+```
+pip 버전 확인
+```
+pip --version
+pip 20.0.2
+```
+flask 설치
+```
+pip install requests flask
+```
+hostfile 설정
+```
+#sudo vi /etc/hosts
+
+127.0.0.1 service-a.example.com service-b.example.com
+```
+
+
+### 
