@@ -10,7 +10,7 @@ vault pki를 활용한 mTLS 사용 가이드
 
 
 
-### 0-2. TLS의 정의
+### 0-1. TLS의 정의
 
 
 네트워크 통신에서 데이터 보안을 위한 프로토콜로, 국제 인터넷 표준화 기구(IETF)에서 표준으로 인정받음
@@ -37,13 +37,32 @@ vault pki를 활용한 mTLS 사용 가이드
 </p>
 
 
-### 0-1. mTLS 정의
+### 0-2. mTLS 정의
 
 
 mutual Transport Layer Security의 약자로, 상호 인증된 SSL/TLS 연결을 구성하기 위한 프로토콜 \
-일반적으로 SSL/TLS을 사용하면 클라이언트는 서버에 대하여 인증서를 통해 검증하지만, 서버는 클라이언트에 대하여 인증서를 검증하지 않아 서버와 클라이언트 간의 단방향 인증만을 지원함
-이러한 경우에는 서버 측에서는 클라이언트의 신원을 확인할 수 없으므로 보안 상의 문제가 발생할 수도 있음
+일반적으로 SSL/TLS을 사용하면 클라이언트는 서버에 대하여 인증서를 통해 검증하지만, 서버는 클라이언트에 대하여 인증서를 검증하지 않아 서버와 클라이언트 간의 단방향 인증만을 지원함 \
+이러한 경우에는 서버 측에서는 클라이언트의 신원을 확인할 수 없으므로 보안 상의 문제가 발생할 수도 있음 \
 mTLS는 이러한 문제를 해결하기 위해, 클라이언트가 서버의 인증서를 검증하고, 서버는 클라이언트의 인증서를 검증하는 양방향 인증 방식을 제공하여 서버와 클라이언트 간의 상호 신뢰가 확립되고, 서로의 신원을 확인할 수 있음
+
+
+
+### 0-2. TLS Handshake 과정
+<p align="center">
+  <img
+    src="https://raw.githubusercontent.com/Great-Stone/images/master/uPic/image-20230320091036089.png"
+  />
+</p>
+
+
+
+### 0-3. mTLS Handshake 과정
+<p align="center">
+  <img
+    src="https://raw.githubusercontent.com/Great-Stone/images/master/uPic/image-20230320091236622.png"
+  />
+</p>
+
 
 
 
