@@ -22,7 +22,13 @@ vault pki를 활용한 mTLS 사용 가이드
 - 인증 : 클라이언트와 서버가 서로를 인증하여 상호 신뢰 관계를 형성하고 X.509 인증서를 사용하여 서버와 클라이언트를 인증
 인증서는 인증 기관(CA)에서 발급되며, 인증서에는 발급자 정보, 공개키, 서버 또는 클라이언트의 식별 정보 등이 포함됨
 
-![img](https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FcRsBaG%2FbtqE4DyXDqG%2FK6BxQuKq8CwVcjKs6WgpMK%2Fimg.png)
+<center>
+  <img
+    src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FcRsBaG%2FbtqE4DyXDqG%2FK6BxQuKq8CwVcjKs6WgpMK%2Fimg.png"
+    width="100"
+    height="200"
+  />
+</center>
 
 
 ### 0-1. mTLS 정의
