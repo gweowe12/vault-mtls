@@ -22,6 +22,15 @@ vault pki를 활용한 mTLS 사용 가이드
 - 인증 : 클라이언트와 서버가 서로를 인증하여 상호 신뢰 관계를 형성하고 X.509 인증서를 사용하여 서버와 클라이언트를 인증
 인증서는 인증 기관(CA)에서 발급되며, 인증서에는 발급자 정보, 공개키, 서버 또는 클라이언트의 식별 정보 등이 포함됨
 
+|프로토콜|설명|
+|------|---|
+|Handshake|클라이언트와 서버 간의 연결을 맺기 위한 3-way handshake 과정으로, SYN, SYN-ACK, ACK 패킷을 주고받아 연결을 설정|
+|Change Cipher Spec|TLS 핸드셰이크 과정에서 서로 약속한 대칭키 암호화 방식으로 암호화된 통신을 시작하기 전에, 클라이언트와 서버가 암호화 방식 변경을 완료했음을 나타내는 프로토콜|
+|Alert|TLS 연결에서 발생한 오류 상황을 전송하는 프로토콜로, 오류 유형과 심각도 등의 정보를 포함하여 상대방에게 전달|
+|Application Data|TLS 핸드셰이크 프로토콜을 통해 암호화된 통신에서 실제로 전달되는 애플리케이션 데이터|
+|Record|TLS 핸드셰이크 프로토콜을 통해 암호화, 복호화, 무결성 검증 등을 수행|
+
+
 <p align="center">
   <img
     src="https://img1.daumcdn.net/thumb/R1280x0/?scode=mtistory2&fname=https%3A%2F%2Fblog.kakaocdn.net%2Fdn%2FcRsBaG%2FbtqE4DyXDqG%2FK6BxQuKq8CwVcjKs6WgpMK%2Fimg.png"
