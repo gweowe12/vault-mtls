@@ -50,7 +50,7 @@ mTLS는 이러한 문제를 해결하기 위해, 클라이언트가 서버의 �
 ### 0-2. TLS Handshake 과정
 <p align="center">
   <img
-    src="https://i.postimg.cc/2SbhXTSk/2023-04-04-1-35-01.png"
+    src="https://files.slack.com/files-pri/T046Y57PB9U-F051QLSSA12/_______________________________2023-04-04______________1.35.01.png"
   />
 </p>
 
