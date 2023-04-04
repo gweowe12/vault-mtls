@@ -77,7 +77,7 @@ Token (will be hidden): [Root_Token]
 
 
 
-## 2. pki를 활용하여 service-a, service-b 인증서 생성
+## 2. pki를 활용하여 service 인증서 생성
 
 
 클라이언트와 서버가 서로를 인증할 수 있도록 인증서를 생성한다. \
