@@ -12,14 +12,12 @@ vault pki를 활용한 mTLS 사용 가이드 (Dev 환경을 기준으로 구축)
 ### 0-1. TLS의 정의
 
 
-네트워크 통신에서 데이터 보안을 위한 프로토콜 \
-국제 인터넷 표준화 기구(IETF) 표준
+네트워크 통신에서 데이터 보안을 위한 프로토콜이며, 국제 인터넷 표준화 기구(IETF) 표준으로 지정되어있다.
 
 
-- 기밀성 : 데이터를 암호화하여 제3자가 중간에서 데이터를 볼 수 없도록 하고 대칭키 암호화 방식으로 데이터를 암호화하고, 공개키 암호화 방식으로 대칭키를 교환함
-- 무결성 : 데이터가 중간에서 변조되지 않도록 보호하고 메시지 인증 코드(MAC)를 사용하여 데이터가 변경되지 않았음을 검증함
-- 인증 : 클라이언트와 서버가 서로를 인증하여 상호 신뢰 관계를 형성하고 X.509 인증서를 사용하여 서버와 클라이언트를 인증
-인증서는 인증 기관(CA)에서 발급되며, 인증서에는 발급자 정보, 공개키, 서버 또는 클라이언트의 식별 정보 등이 포함됨
+- 기밀성 : 데이터를 암호화하여 제3자가 중간에서 데이터를 볼 수 없도록 한다. 대칭키 암호화 방식으로 데이터를 암호화하고, 공개키 암호화 방식으로 대칭키를 교환한다.
+- 무결성 : 데이터가 중간에서 변조되지 않도록 보호하고 메시지 인증 코드(MAC)를 사용하여 데이터가 변경되지 않았음을 검증한다.
+- 인증 : 클라이언트와 서버가 서로를 인증하여 상호 신뢰 관계를 형성하고 X.509 인증서를 사용하여 서버와 클라이언트를 인증한다. 인증서는 인증 기관(CA)에서 발급되며, 인증서에는 발급자 정보, 공개키, 서버 또는 클라이언트의 식별 정보 등이 포함한다.
 
 |프로토콜|설명|
 |------|---|
@@ -40,9 +38,7 @@ vault pki를 활용한 mTLS 사용 가이드 (Dev 환경을 기준으로 구축)
 ### 0-2. mTLS 정의
 
 
-mutual Transport Layer Security의 약자로, 상호 인증된 SSL/TLS 연결을 구성하기 위한 프로토콜 \
-일반적으로 SSL/TLS을 사용하면 클라이언트는 서버에 대하여 인증서를 통해 검증하지만, 서버는 클라이언트에 대하여 인증서를 검증하지 않아 서버와 클라이언트 간의 단방향 인증만을 지원하는데, 이러한 경우에는 서버 측에서는 클라이언트의 신원을 확인할 수 없으므로 보안 상의 문제가 발생할 수도 있음 \
-mTLS는 이러한 문제를 해결하기 위해, 클라이언트가 서버의 인증서를 검증하고, 서버는 클라이언트의 인증서를 검증하는 양방향 인증 방식을 제공하여 서버와 클라이언트 간의 상호 신뢰가 확립되고, 서로의 신원을 확인할 수 있음
+mutual Transport Layer Security의 약자로, 상호 인증된 SSL/TLS 연결을 구성하기 위한 프로토콜이다. 일반적으로 SSL/TLS을 사용하면 클라이언트는 서버에 대하여 인증서를 통해 검증하지만, 서버는 클라이언트에 대하여 인증서를 검증하지 않아 서버와 클라이언트 간의 단방향 인증만을 지원하는데, 이러한 경우에는 서버 측에서는 클라이언트의 신원을 확인할 수 없으므로 보안 상의 문제가 발생할 수도 있다. mTLS는 이러한 문제를 해결하기 위해, 클라이언트가 서버의 인증서를 검증하고, 서버는 클라이언트의 인증서를 검증하는 양방향 인증 방식을 제공하여 서버와 클라이언트 간의 상호 신뢰가 확립되고, 서로의 신원을 확인할 수 있다.
 
 
 
@@ -77,10 +73,6 @@ vault login
 
 Token (will be hidden): [Root_Token]
 ```
-또는
-```
-export VAULT_TOKEN=[Root_Token]
-```
 
 
 
@@ -88,7 +80,8 @@ export VAULT_TOKEN=[Root_Token]
 ## 2. pki를 활용하여 service-a, service-b 인증서 생성
 
 
-클라이언트와 서버가 각각 서로를 인증할 수 있도록 인증서를 2개 생성 (원활한 demo 진행을 위해 cert 폴더 안에 생성하는 것을 요망)
+클라이언트와 서버가 서로를 인증할 수 있도록 인증서를 생성한다. \
+cert 폴더 안에서 진행한다.
 
 
 
@@ -137,8 +130,7 @@ vault write pki/root/generate/internal \
 - common_name : 인증서가 발급되는 도메인 이름
 - ttl : 발급되는 인증서의 유효기간
 
-root CA를 발급할 경우 certificate와 issuing_ca 2개가 발급되는데 이 예제에서는 Intermediate CA를 따로 지정하지 않아 2개의 값이 같음
-둘중 아무거나 복사하여 ca.crt로 저장
+root CA를 발급 받을 경우 certificate와 issuing_ca 2개가 발급되는데 이 예제에서는 Intermediate CA를 따로 지정하지 않아 2개의 값이 같다. 그러므로 둘중 아무거나 복사하여 ca.crt로 저장한다.
 
 
 
@@ -177,14 +169,14 @@ vault write pki/issue/example-dot-com \
 ```
 - common_name : 인증서의 주체를 지정
 
-인증서를 발급할 경우 ca_chain, certificate, issuing_ca, private_key 4개가 발급됨
+인증서를 발급할 경우 ca_chain, certificate, issuing_ca, private_key 4개가 발급된다.
 - ca_chain : Root CA를 포함한 인증서 체인
 - certificate : 인증서의 공개키와 서버의 정보
 - issuing_ca : 인증서를 발급한 Intermediate CA의 인증서 (이 예제의 경우 Intermediate CA를 따로 지정하지 않아 Root CA와 값이 같음)
 - private_key : 인증서의 개인키 정보
 
 
-certificate를 service.crt 파일로 저장하고 private_key를 service.key 파일로 저장
+certificate를 service.crt 파일로 저장하고 private_key를 service.key 파일로 저장한다.
 
 
 
@@ -192,7 +184,7 @@ certificate를 service.crt 파일로 저장하고 private_key를 service.key 파
 ## 3. mTLS 테스트
 
 
-service 인증서를 사용하여 클라이언트와 서버를 서로 인증하는 테스트 수행
+service 인증서를 사용하여 클라이언트와 서버를 서로 인증하는 테스트를 수행한다.
 
 
 ### 3-1. 사전 준비 사항
@@ -230,7 +222,8 @@ hostfile 설정
 ### 3-2. mTLS 어플리케이션 실행 
 
 
-python 폴더로 진입
+python 폴더 안에서 진행한다.
+
 
 ```
 # main.py
@@ -270,7 +263,7 @@ curl failed to verify the legitimacy of the server and therefore could not
 establish a secure connection to it. To learn more about this situation and
 how to fix it, please visit the web page mentioned above.
 ```
-클라이언트에서 인증서를 검증할 수 없기 때문에 연결이 실패
+클라이언트에서 인증서를 검증할 수 없기 때문에 연결에 실패한다.
 
 
 ```
@@ -283,7 +276,7 @@ output :
 ```
 curl: (55) OpenSSL SSL_write: Connection reset by peer, errno 104
 ```
-클라이언트 측에서 인증서 검증을 무시해도 어플리케이션은 인증서를 요구하기 때문에 에러 발생
+클라이언트 측에서 인증서 검증을 무시해도 어플리케이션은 인증서를 요구하기 때문에 에러가 발생한다.
 
 
 ```
@@ -293,11 +286,15 @@ output :
 ```
 Hello World!%
 ```
-root CA, key, cert 파일을 어플리케이션에 제공하여 mTLS 인증 성공
+root CA, key, cert 파일을 어플리케이션에 제공하여 mTLS 인증에 성공한다.
+
 
 
 
 ## 4. vault Agent를 이용하여 자동 갱신
+
+
+Agent 폴더 안에서 수행한다.
 
 
 ### 4-1. Agent에게 부여할 권한 생성
@@ -321,7 +318,7 @@ EOF
 - 'path "pki*"' :  pki와 관련된 모든 경로에 대해 관리하기 위한 경로
 
 
-vault Agent가 pki를 자동 갱신 작업을 수행할 수 있도록 권한을 부여
+vault Agent가 pki를 자동 갱신 작업을 수행할 수 있도록 권한을 부여한다.
 
 
 
@@ -352,7 +349,7 @@ vault write -f -field=secret_id auth/approle/role/pki-agent/secret-id > secretid
 ```
 
 
-vault Agent가 인증하기 위해 roldid와 secretid를 따로 저장 (secretid는 roleid와 달리 TTL이 존재하기 때문에 시간에 따라 변경될 수도 있으며, vault Agent를 실행할 경우 파일이 사라짐)
+vault Agent가 인증하기 위해 roldid와 secretid를 따로 저장한다. (secretid는 roleid와 달리 TTL이 존재하기 때문에 시간에 따라 변경될 수도 있으며, vault Agent를 실행할 경우 파일이 사라진다.)
 
 
 
@@ -430,4 +427,5 @@ output :
 
 2023-04-04T01:38:41.187Z [DEBUG] (runner) all templates rendered
 ```
-vault Agent 작업이 끝나면 인증서가 새로 발급되어 교체 완료
+vault Agent 작업이 끝나면 인증서가 새로 발급된다. \
+어플리케이션을 실행해서 확인해보면 성공적으로 인증이 되지만, 지정 TTL인 2분이 지나면 인증에 실패한다.
