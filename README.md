@@ -47,24 +47,6 @@ mTLS는 이러한 문제를 해결하기 위해, 클라이언트가 서버의 �
 
 
 
-### 0-2. TLS Handshake 과정
-<p align="center">
-  <img
-    src="https://files.slack.com/files-pri/T046Y57PB9U-F051QLSSA12/_______________________________2023-04-04______________1.35.01.png"
-  />
-</p>
-
-
-
-### 0-3. mTLS Handshake 과정
-<p align="center">
-  <img
-    src="https://raw.githubusercontent.com/Great-Stone/images/master/uPic/image-20230320091236622.png"
-  />
-</p>
-
-
-
 
 ## 1. vault 실행 및 환경 구축
 
