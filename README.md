@@ -4,10 +4,15 @@ python 어플리케이션 및 자료 출처 : https://github.com/Great-Stone/vau
 vault pki를 활용한 mTLS 사용 가이드
 (Dev 환경을 기준으로 구축)
 
+## 0. mTLS 정의
+
+mutual Transport Layer Security의 약자로, 상호 인증된 SSL/TLS 연결을 구성하기 위한 프로토콜
+일반적으로 SSL/TLS을 사용하면 클라이언트는 서버에 대하여 인증서를 통해 검증하지만, 서버는 클라이언트에 대하여 인증서를 검증하지 않아 서버와 클라이언트 간의 단방향 인증만을 지원함
+이러한 경우에는 서버 측에서는 클라이언트의 신원을 확인할 수 없으므로 보안 상의 문제가 발생할 수도 있음
+mTLS는 이러한 문제를 해결하기 위해, 클라이언트가 서버의 인증서를 검증하고, 서버는 클라이언트의 인증서를 검증하는 양방향 인증 방식을 제공하여 서버와 클라이언트 간의 상호 신뢰가 확립되고, 서로의 신원을 확인할 수 있음
 
 
-
-## 1. vault 실행
+## 1. vault 실행 및 환경 구축
 
 
 
@@ -20,11 +25,7 @@ vault server -dev
 
 
 
-## 2. vault 사용 환경 구축
-
-
-
-### 2-1. vault 주소 지정
+### 1-2. vault 주소 지정
 
 
 ```
@@ -33,7 +34,7 @@ export vault_ADDR=http://127.0.0.1:8200
 
 
 
-### 2-2. Root Ten으로 로그인 하기
+### 1-3. Root Token으로 로그인 하기
 
 
 ```
@@ -49,11 +50,11 @@ export VAULT_TOKEN=[Root_Token]
 
 
 
-## 3. pki를 활용하여 'service-a', 'service-b' 인증서 생성
+## 2. pki를 활용하여 'service-a', 'service-b' 인증서 생성
+클라이언트와 서버가 서로를 인증할 수 있도록 인증서를 2개 생성
 
 
-
-### 3-1. pki 활성화
+### 2-1. pki 활성화
 
 
 ```
@@ -62,7 +63,7 @@ vault secrets enable pki
 
 
 
-### 3-2. default MAX_TTL 변경
+### 2-2. default MAX_TTL 변경
 
 
 ```
@@ -70,11 +71,8 @@ vault secrets tune -max-lease-ttl=876006h pki
 ```
 
 
-10년짜리 인증서를 생성하기 위해서 default MAX_TTL을 10년으로 변경
 
-
-
-### 3-3. Root CA 생성
+### 2-3. Root CA 생성
 
 
 ```
@@ -107,7 +105,7 @@ vault write pki/root/generate/internal \
 
 
 
-### 3-4. CRL(Certificate Revocation List)의 Endpoint 작성
+### 2-4. CRL(Certificate Revocation List)의 Endpoint 작성
 
 
 ```
@@ -119,12 +117,8 @@ vault write pki/config/urls \
 - crl_distribution_points : CRL의 배포 위치 지정
 
 
-인증서의 폐지 여부를 확인하기 위해 클라이언트는 CRL 파일을 다운로드하고, 해당 CRL 파일의 서명이 유효한지 확인하기 위해 issuing_certificates 옵션에 지정된 CA 인증서를 다운로드하여 검증함
-또한 crl_distribution_points 옵션에 지정된 위치에서 CRL을 확인하고, CRL에 해당하는 인증서가 존재하는 경우 해당 인증서를 폐지함
 
-
-
-### 3-5. pki Role 생성
+### 2-5. pki Role 생성
 
 
 ```
@@ -137,7 +131,7 @@ vault write pki/roles/example-dot-com \
 
 
 
-### 3-6. 'service-a' 인증서 발급
+### 2-6. 'service-a' 인증서 발급
 
 
 ```
@@ -157,7 +151,7 @@ vault write pki/issue/example-dot-com \
 
 
 
-### 3-7. 'service-b' 인증서 발급
+### 2-7. 'service-b' 인증서 발급
 
 
 ```
@@ -171,11 +165,11 @@ vault write pki/issue/example-dot-com \
 
 
 
-## 4. mTLS 테스트
+## 3. mTLS 테스트
+'service-a' 인증서와 'service-b' 인증서를 사용하여 클라이언트와 서버를 서로 인증하는 테스트 수행
 
 
-
-### 4-1. 사전 준비 사항
+### 3-1. 사전 준비 사항
 
 
 python 버전 확인
@@ -200,14 +194,14 @@ pip install requests flask
 
 hostfile 설정
 ```
-#sudo vi /etc/hosts
+# hosts
 
-127.0.0.1 service-a.example.com service-b.example.com
+127.0.0.1 service-b.example.com
 ```
 
 
 
-### 4-2. mTLS 어플리케이션 실행 
+### 3-2. mTLS 어플리케이션 실행 
 
 
 ```
@@ -225,6 +219,7 @@ if __name__ == "__main__":
 - ssl.create_default_context : 어플리케이션에 삽입 시킬 인증서의 root CA 파일 지정
 - ssl_context.load_cert_chain : cert와 key를 chain으로 만듦
 - ssl_context.verify_mode : 어플리케이션과 클라이언트 양측 인증서에 대한 검증을 수행 (mTLS의 역할 수행)
+- app.run : vault Agent를 통해 인증서가 변경될 경우, flask가 재실행 되도록 구성
 
 
 ```
@@ -233,7 +228,7 @@ python3 main.py
 
 
 
-### 4-3. curl을 사용해서 검증하기
+### 3-3. curl을 사용해서 검증하기
 
 
 ```
@@ -269,4 +264,144 @@ output :
 ```
 Hello from "service-b"%
 ```
-curl에 root CA, key, cert 파일을 어플리케이션에 제공하여 mTLS에 대한 테스트 완료
+root CA, key, cert 파일을 어플리케이션에 제공하여 mTLS 인증 성공
+
+
+
+## 4. vault Agent를 이용하여 자동 갱신
+
+
+### 4-1. Agent에게 부여할 권한 생성
+
+
+```
+vault policy write pki_agent - << EOF
+path "sys/mounts/*" {
+  capabilities = [ "create", "read", "update", "delete", "list" ]
+}
+path "sys/mounts" {
+  capabilities = [ "read", "list" ]
+}
+path "pki*" {
+  capabilities = [ "create", "read", "update", "delete", "list", "sudo" ]
+}
+EOF
+```
+- 'path "sys/mounts/*"' : 시스템의 마운트 포인트를 관리하기 위한 경로
+- 'path "sys/mounts"' : 현재 마운트된 백엔드 엔진의 정보를 제공하기 위한 경로
+- 'path "pki*"' :  pki와 관련된 모든 경로에 대해 관리하기 위한 경로
+
+
+vault Agent가 pki를 자동 갱신 작업을 수행할 수 있도록 권한을 부여
+
+
+
+### 4-2. Agent가 사용할 인증 수단 생성
+
+
+```
+vault auth enable approle
+```
+
+
+```
+vault write auth/approle/role/pki-agent \
+    secret_id_ttl=120m \
+    token_ttl=60m \
+    token_max_tll=120m \
+    policies="pki_agent"
+```
+
+
+```
+vault read -field=role_id auth/approle/role/pki-agent/role-id > roleid
+```
+
+
+```
+vault write -f -field=secret_id auth/approle/role/pki-agent/secret-id > secretid
+```
+
+
+vault Agent가 인증하기 위해 roldid와 secretid를 따로 저장 (secretid는 roleid와 달리 TTL이 존재하기 때문에 시간에 따라 변경될 수도 있으며, vault Agent를 실행할 경우 파일이 사라짐)
+
+
+
+### 4-3. vault Agent 템플릿 확인
+
+
+```
+# vault_agent.hcl
+
+auto_auth {
+  method  {
+    type = "approle"
+    config = {
+      role_id_file_path = "roleid"
+      secret_id_file_path = "secretid"
+    }
+  }
+
+  sink {
+    type = "file"
+    config = {
+      path = "/tmp/vault_agent"
+    }
+  }
+}
+
+# -------------------- 생략 --------------------
+
+template {
+  source      = "ca-a.tpl"
+  destination = "../cert/ca.crt"
+}
+
+# -------------------- 생략 --------------------
+```
+- method : vault Agent가 인증할 방식을 구성
+- sink : vault Agent가 template의 source에서 가져온 데이터를 처리하기 위한 일련의 작업을 수행하는 서비스 또는 애플리케이션을 지정
+- source : 저장된 시크릿 데이터를 읽어들이기 위한 경로
+- destination : 읽은 데이터를 적용할 대상 경로
+
+
+```
+# ca-a.tpl
+
+{{- /* ca-a.tpl */ -}}
+{{ with secret "pki/issue/example-dot-com" "common_name=service-a.example.com" "ttl=2m" }}
+{{ .Data.issuing_ca }}{{ end }}
+```
+- with secret : 데이터를 가져오기 위한 endpoint 지정
+- common_name : 인증서의 주체를 지정
+- ttl : 인증서의 유효기간 지정 (테스트를 위해 짧게 지정함)
+
+
+
+### 4-4. vault Agent 실행
+
+
+```
+vault agent -config=vault_agent.hcl -log-level=debug
+```
+
+output :
+```
+2023-04-04T01:38:41.182Z [DEBUG] (runner) checking template 4903c0854a0a6bdcd74cf9219422748a
+2023-04-04T01:38:41.183Z [DEBUG] (runner) rendering "ca-a.tpl" => "../cert/ca.crt"
+2023-04-04T01:38:41.183Z [DEBUG] (runner) checking template a04612e63b9a03a45ef968a8984a23db
+2023-04-04T01:38:41.183Z [DEBUG] (runner) rendering "cert-a.tpl" => "../cert/service-a.crt"
+2023-04-04T01:38:41.183Z [DEBUG] (runner) checking template 850589d81f7afe64c7c5a0a8440c8569
+2023-04-04T01:38:41.183Z [DEBUG] (runner) rendering "key-a.tpl" => "../cert/service-a.key"
+2023-04-04T01:38:41.184Z [DEBUG] (runner) checking template 60e7f2683d2c76a501eb54879bf89ad2
+2023-04-04T01:38:41.184Z [DEBUG] (runner) rendering "cert-b.tpl" => "../cert/service-b.crt"
+2023-04-04T01:38:41.185Z [INFO] (runner) rendered "cert-b.tpl" => "../cert/service-b.crt"
+2023-04-04T01:38:41.185Z [DEBUG] (runner) checking template 1fb22b9f15857b7eeb0b68a3c9ac6d20
+2023-04-04T01:38:41.185Z [DEBUG] (runner) rendering "key-b.tpl" => "../cert/service-b.key"
+2023-04-04T01:38:41.187Z [INFO] (runner) rendered "key-b.tpl" => "../cert/service-b.key"
+
+# -------------------- 생략 --------------------
+
+2023-04-04T01:38:41.187Z [DEBUG] (runner) all templates rendered
+```
+vault Agent 작업이 끝나면 인증서가 새로 발급되어 교체 완료
