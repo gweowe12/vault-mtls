@@ -1,7 +1,7 @@
 # vault-mTLS
-python 어플리케이션 및 자료 출처 : https://github.com/Great-Stone/vault-mtls-demo
+자료 출처 : https://github.com/Great-Stone/vault-mtls-demo
 
-vault pki를 활용한 mTLS 사용 가이드 (Dev 환경을 기준으로 구축)
+vault pki를 활용한 mTLS 사용 가이드 (Dev 환경을 기준으로 구현)
 
 
 
