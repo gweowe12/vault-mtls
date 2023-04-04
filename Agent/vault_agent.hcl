@@ -22,26 +22,16 @@ vault {
 }
 
 template {
-  source      = "ca-a.tpl"
+  source      = "ca.tpl"
   destination = "../cert/ca.crt"
 }
 
 template {
-  source      = "cert-a.tpl"
-  destination = "../cert/service-a.crt"
+  source      = "cert.tpl"
+  destination = "../cert/service.crt"
 }
 
 template {
-  source      = "key-a.tpl"
-  destination = "../cert/service-a.key"
-}
-
-template {
-  source      = "cert-b.tpl"
-  destination = "../cert/service-b.crt"
-}
-
-template {
-  source      = "key-b.tpl"
-  destination = "../cert/service-b.key"
+  source      = "key.tpl"
+  destination = "../cert/service.key"
 }
