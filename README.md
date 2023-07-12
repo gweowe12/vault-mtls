@@ -97,8 +97,6 @@ vault login
 
 ##### Output :
 
-##### Output :
-
 ```
 Token (will be hidden): [Root Token]
 ```
