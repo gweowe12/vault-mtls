@@ -20,7 +20,7 @@ TLS는 네트워크 통신에서 데이터 보안을 위한 프로토콜이며, 
 
 
 
-![img](https://raw.githubusercontent.com/gweowe/Image-Server/main/mtls/mtls_1.png?token=GHSAT0AAAAAACEP7LWK3N3UDWOFVXJ7SARQZE5FIEQ)
+![img](https://raw.githubusercontent.com/gweowe/Image-Server/main/mtls/mtls_1.png?token=GHSAT0AAAAAACEUPCZF3ZLFGPDCNZFGSRGKZFONPJA)
 
 | 프로토콜           | 설명                                                         |
 | ------------------ | ------------------------------------------------------------ |
