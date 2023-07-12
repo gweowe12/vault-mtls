@@ -44,7 +44,7 @@ mutual Transport Layer Security의 약자로, 상호 인증된 SSL/TLS 연결을
 
 ## Vault 실행 및 환경 구축
 
-이미 구축되어있는 서버가 존재한다면 스킵하셔도 됩니다.
+실습 Github에서 clone을 받아와서 실습을 진행합니다.
 
 ### 1. 개발 서버 실행
 
