@@ -1,3 +1,3 @@
 {{- /* cert.tpl */ -}}
-{{ with secret "pki/issue/example-dot-com" "common_name=service.example.com" "ttl=2m" }}
+{{ with secret "pki/issue/server-dot-com" "common_name=gweowe.server.com" "ttl=5m" }}
 {{ .Data.certificate }}{{ end }}

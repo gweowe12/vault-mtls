@@ -28,10 +28,10 @@ template {
 
 template {
   source      = "cert.tpl"
-  destination = "../cert/service.crt"
+  destination = "../cert/server.crt"
 }
 
 template {
   source      = "key.tpl"
-  destination = "../cert/service.key"
+  destination = "../cert/server.key"
 }
