@@ -1,8 +1,6 @@
 # vault-mTLS
 참고 자료 : https://github.com/Great-Stone/vault-mtls-demo
 
-실습 Github : https://github.com/gweowe12/vault-mtls
-
 실습 velog : https://velog.io/@gweowe/Vault-pki를-활용한-mTLS-구현-MacOS
 
 
